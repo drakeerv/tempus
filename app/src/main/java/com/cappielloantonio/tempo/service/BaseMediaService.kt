@@ -132,12 +132,10 @@ open class BaseMediaService : MediaLibraryService() {
             override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
                 super.onMediaMetadataChanged(mediaMetadata)
                 
-                // Use metadata duration for transcoded streams
-                if (mediaMetadata.extras?.containsKey("DURATION_MS") == true) {
-                    val correctDuration = mediaMetadata.extras?.getLong("DURATION_MS") ?: 0
-                    if (correctDuration > 0) {
-                        Log.d(javaClass.toString(), "Using metadata duration: $correctDuration ms for transcoded stream")
-                    }
+                // Log when metadata duration is available for transcoded streams
+                if (mediaMetadata.extras?.containsKey("DURATION_MS") == true 
+                    && (mediaMetadata.extras?.getLong("DURATION_MS") ?: 0) > 0) {
+                    Log.d(javaClass.toString(), "Using metadata duration for transcoded stream")
                 }
             }
 

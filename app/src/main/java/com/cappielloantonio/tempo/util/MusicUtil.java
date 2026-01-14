@@ -88,10 +88,10 @@ public class MusicUtil {
             uri.append("&c=").append(params.get("c"));
 
         // Add transcoding params
-        if (!Preferences.isServerPrioritized())
+        if (!Preferences.isServerPrioritized()) {
             uri.append("&maxBitRate=").append(getBitratePreference());
-        if (!Preferences.isServerPrioritized())
             uri.append("&format=").append(getTranscodingFormatPreference());
+        }
         if (Preferences.askForEstimateContentLength())
             uri.append("&estimateContentLength=true");
 
