@@ -218,35 +218,37 @@ open class BaseMediaService : MediaLibraryService() {
                         val transcodingFormat = MusicUtil.getTranscodingFormatPreference()
                         
                         // Check if transcoding is active (not "raw")
-                        if (!transcodingFormat.equals("raw")) {
+                        if (transcodingFormat != "raw") {
                             val mediaId = currentItem.mediaMetadata.extras.getString("id")
-                            val seekPositionMs = newPosition.positionMs
-                            val seekPositionSeconds = seekPositionMs / 1000
-                            
-                            Log.d(javaClass.toString(), "Seek detected in transcoded stream to ${seekPositionSeconds}s, restarting stream with timeOffset")
-                            
-                            // Build new URI with timeOffset
-                            val newUri = MusicUtil.getStreamUriWithOffset(mediaId, seekPositionSeconds)
-                            
-                            // Create updated MediaItem with new URI
-                            val newItem = currentItem.buildUpon()
-                                .setUri(newUri)
-                                .setRequestMetadata(
-                                    currentItem.requestMetadata.buildUpon()
-                                        .setMediaUri(newUri)
-                                        .build()
-                                )
-                                .build()
-                            
-                            // Replace the current media item and start from beginning of new stream
-                            val currentIndex = player.currentMediaItemIndex
-                            player.replaceMediaItem(currentIndex, newItem)
-                            player.seekTo(currentIndex, 0)
-                            player.prepare()
-                            if (oldPosition.playWhenReady) {
-                                player.play()
+                            if (mediaId != null) {
+                                val seekPositionMs = newPosition.positionMs
+                                val seekPositionSeconds = seekPositionMs / 1000
+                                
+                                Log.d(javaClass.toString(), "Seek detected in transcoded stream to ${seekPositionSeconds}s, restarting stream with timeOffset")
+                                
+                                // Build new URI with timeOffset
+                                val newUri = MusicUtil.getStreamUriWithOffset(mediaId, seekPositionSeconds)
+                                
+                                // Create updated MediaItem with new URI
+                                val newItem = currentItem.buildUpon()
+                                    .setUri(newUri)
+                                    .setRequestMetadata(
+                                        currentItem.requestMetadata.buildUpon()
+                                            .setMediaUri(newUri)
+                                            .build()
+                                    )
+                                    .build()
+                                
+                                // Replace the current media item and start from beginning of new stream
+                                val currentIndex = player.currentMediaItemIndex
+                                player.replaceMediaItem(currentIndex, newItem)
+                                player.seekTo(currentIndex, 0)
+                                player.prepare()
+                                if (oldPosition.playWhenReady) {
+                                    player.play()
+                                }
+                                return
                             }
-                            return
                         }
                     }
                 }
