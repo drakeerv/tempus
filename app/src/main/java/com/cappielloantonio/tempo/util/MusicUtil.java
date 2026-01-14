@@ -66,42 +66,6 @@ public class MusicUtil {
         return Uri.parse(uri.toString());
     }
 
-    public static Uri getStreamUriWithOffset(String id, long offsetSeconds) {
-        Map<String, String> params = App.getSubsonicClientInstance(false).getParams();
-
-        StringBuilder uri = new StringBuilder();
-        uri.append(App.getSubsonicClientInstance(false).getUrl());
-        uri.append("stream");
-
-        // Add authentication params
-        if (params.containsKey("u") && params.get("u") != null)
-            uri.append("?u=").append(Util.encode(params.get("u")));
-        if (params.containsKey("p") && params.get("p") != null)
-            uri.append("&p=").append(params.get("p"));
-        if (params.containsKey("s") && params.get("s") != null)
-            uri.append("&s=").append(params.get("s"));
-        if (params.containsKey("t") && params.get("t") != null)
-            uri.append("&t=").append(params.get("t"));
-        if (params.containsKey("v") && params.get("v") != null)
-            uri.append("&v=").append(params.get("v"));
-        if (params.containsKey("c") && params.get("c") != null)
-            uri.append("&c=").append(params.get("c"));
-
-        // Add transcoding params
-        if (!Preferences.isServerPrioritized()) {
-            uri.append("&maxBitRate=").append(getBitratePreference());
-            uri.append("&format=").append(getTranscodingFormatPreference());
-        }
-        if (Preferences.askForEstimateContentLength())
-            uri.append("&estimateContentLength=true");
-
-        uri.append("&id=").append(id);
-        uri.append("&timeOffset=").append(offsetSeconds);
-
-        Log.d(TAG, "getStreamUriWithOffset: " + uri);
-        return Uri.parse(uri.toString());
-    }
-
     public static Uri updateStreamUri(Uri uri) {
         String s = uri.toString();
         Matcher m1 = BITRATE_PATTERN.matcher(s);
