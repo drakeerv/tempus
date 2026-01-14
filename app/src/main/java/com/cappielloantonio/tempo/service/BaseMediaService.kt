@@ -211,6 +211,46 @@ open class BaseMediaService : MediaLibraryService() {
                 Log.d(javaClass.toString(), "onPositionDiscontinuity")
                 super.onPositionDiscontinuity(oldPosition, newPosition, reason)
 
+                // Handle seeking in transcoded streams
+                if (reason == Player.DISCONTINUITY_REASON_SEEK) {
+                    val currentItem = player.currentMediaItem
+                    if (currentItem != null && currentItem.mediaMetadata.extras != null) {
+                        val transcodingFormat = MusicUtil.getTranscodingFormatPreference()
+                        
+                        // Check if transcoding is active (not "raw")
+                        if (!transcodingFormat.equals("raw")) {
+                            val mediaId = currentItem.mediaMetadata.extras.getString("id")
+                            val seekPositionMs = newPosition.positionMs
+                            val seekPositionSeconds = seekPositionMs / 1000
+                            
+                            Log.d(javaClass.toString(), "Seek detected in transcoded stream to ${seekPositionSeconds}s, restarting stream with timeOffset")
+                            
+                            // Build new URI with timeOffset
+                            val newUri = MusicUtil.getStreamUriWithOffset(mediaId, seekPositionSeconds)
+                            
+                            // Create updated MediaItem with new URI
+                            val newItem = currentItem.buildUpon()
+                                .setUri(newUri)
+                                .setRequestMetadata(
+                                    currentItem.requestMetadata.buildUpon()
+                                        .setMediaUri(newUri)
+                                        .build()
+                                )
+                                .build()
+                            
+                            // Replace the current media item and start from beginning of new stream
+                            val currentIndex = player.currentMediaItemIndex
+                            player.replaceMediaItem(currentIndex, newItem)
+                            player.seekTo(currentIndex, 0)
+                            player.prepare()
+                            if (oldPosition.playWhenReady) {
+                                player.play()
+                            }
+                            return
+                        }
+                    }
+                }
+
                 if (reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
                     if (oldPosition.mediaItem?.mediaMetadata?.extras?.getString("type") == Constants.MEDIA_TYPE_MUSIC) {
                         MediaManager.scrobble(oldPosition.mediaItem, true)
