@@ -67,6 +67,10 @@ public class MappingUtil {
             bundle.putString("transcodedContentType", media.getTranscodedContentType());
             bundle.putString("transcodedSuffix", media.getTranscodedSuffix());
             bundle.putInt("duration", media.getDuration() != null ? media.getDuration() : 0);
+            // Store duration in milliseconds for ExoPlayer to use with transcoded streams
+            if (media.getDuration() != null && media.getDuration() > 0) {
+                bundle.putLong("DURATION_MS", media.getDuration() * 1000L);
+            }
             bundle.putInt("bitrate", media.getBitrate() != null ? media.getBitrate() : 0);
             bundle.putInt("samplingRate", media.getSamplingRate() != null ? media.getSamplingRate() : 0);
             bundle.putInt("bitDepth", media.getBitDepth() != null ? media.getBitDepth() : 0);
@@ -250,6 +254,10 @@ public class MappingUtil {
         bundle.putString("contentType", podcastEpisode.getContentType());
         bundle.putString("suffix", podcastEpisode.getSuffix());
         bundle.putInt("duration", podcastEpisode.getDuration() != null ? podcastEpisode.getDuration() : 0);
+        // Store duration in milliseconds for ExoPlayer to use with transcoded streams
+        if (podcastEpisode.getDuration() != null && podcastEpisode.getDuration() > 0) {
+            bundle.putLong("DURATION_MS", podcastEpisode.getDuration() * 1000L);
+        }
         bundle.putInt("bitrate", podcastEpisode.getBitrate() != null ? podcastEpisode.getBitrate() : 0);
         bundle.putBoolean("isVideo", podcastEpisode.isVideo());
         bundle.putLong("created", podcastEpisode.getCreated() != null ? podcastEpisode.getCreated().getTime() : 0);

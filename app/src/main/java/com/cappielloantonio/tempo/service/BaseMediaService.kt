@@ -129,6 +129,18 @@ open class BaseMediaService : MediaLibraryService() {
                 updateWidget(player)
             }
 
+            override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+                super.onMediaMetadataChanged(mediaMetadata)
+                
+                // Use metadata duration for transcoded streams
+                if (mediaMetadata.extras?.containsKey("DURATION_MS") == true) {
+                    val correctDuration = mediaMetadata.extras?.getLong("DURATION_MS") ?: 0
+                    if (correctDuration > 0) {
+                        Log.d(javaClass.toString(), "Using metadata duration: $correctDuration ms for transcoded stream")
+                    }
+                }
+            }
+
             override fun onTracksChanged(tracks: Tracks) {
                 Log.d(javaClass.toString(), "onTracksChanged " + player.currentMediaItemIndex)
                 ReplayGainUtil.setReplayGain(player, tracks)
@@ -367,7 +379,9 @@ open class BaseMediaService : MediaLibraryService() {
         val artistLink = extras?.getString("assetLinkArtist")
             ?: AssetLinkUtil.buildLink(AssetLinkUtil.TYPE_ARTIST, extras?.getString("artistId"))
         val position = player.currentPosition.takeIf { it != C.TIME_UNSET } ?: 0L
-        val duration = player.duration.takeIf { it != C.TIME_UNSET } ?: 0L
+        val duration = extras?.getLong("DURATION_MS")?.takeIf { it > 0 } 
+            ?: player.duration.takeIf { it != C.TIME_UNSET } 
+            ?: 0L
         WidgetUpdateManager.updateFromState(
             this,
             title ?: "",

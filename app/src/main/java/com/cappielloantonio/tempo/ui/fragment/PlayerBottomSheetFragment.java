@@ -126,7 +126,7 @@ public class PlayerBottomSheetFragment extends Fragment {
         defineProgressBarHandler(mediaBrowser);
         setMediaControllerUI(mediaBrowser);
         setMetadata(mediaBrowser.getMediaMetadata());
-        setContentDuration(mediaBrowser.getContentDuration());
+        setContentDuration(getCorrectDuration(mediaBrowser));
         setPlayingState(mediaBrowser.isPlaying());
         setHeaderMediaController();
         setHeaderNextButtonState(mediaBrowser.hasNextMediaItem());
@@ -136,7 +136,7 @@ public class PlayerBottomSheetFragment extends Fragment {
             public void onMediaMetadataChanged(@NonNull MediaMetadata mediaMetadata) {
                 setMediaControllerUI(mediaBrowser);
                 setMetadata(mediaMetadata);
-                setContentDuration(mediaBrowser.getContentDuration());
+                setContentDuration(getCorrectDuration(mediaBrowser));
             }
 
             @Override
@@ -216,6 +216,18 @@ public class PlayerBottomSheetFragment extends Fragment {
 
     private void setContentDuration(long duration) {
         bind.playerHeaderLayout.playerHeaderSeekBar.setMax((int) (duration / 1000));
+    }
+
+    private long getCorrectDuration(MediaBrowser mediaBrowser) {
+        MediaItem item = mediaBrowser.getCurrentMediaItem();
+        if (item != null && item.mediaMetadata.extras != null) {
+            long metadataDuration = item.mediaMetadata.extras.getLong("DURATION_MS", 0);
+            if (metadataDuration > 0) {
+                return metadataDuration;
+            }
+        }
+        // Fallback to player's duration
+        return mediaBrowser.getContentDuration();
     }
 
     private void setProgress(MediaBrowser mediaBrowser) {
