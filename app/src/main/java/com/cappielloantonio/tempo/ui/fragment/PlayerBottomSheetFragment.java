@@ -221,7 +221,7 @@ public class PlayerBottomSheetFragment extends Fragment {
     private long getCorrectDuration(MediaBrowser mediaBrowser) {
         MediaItem item = mediaBrowser.getCurrentMediaItem();
         if (item != null && item.mediaMetadata.extras != null) {
-            long metadataDuration = item.mediaMetadata.extras.getLong("DURATION_MS", 0);
+            long metadataDuration = item.mediaMetadata.extras.getLong("durationMs", 0);
             if (metadataDuration > 0) {
                 return metadataDuration;
             }

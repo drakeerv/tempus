@@ -133,8 +133,8 @@ open class BaseMediaService : MediaLibraryService() {
                 super.onMediaMetadataChanged(mediaMetadata)
                 
                 // Log when metadata duration is available for transcoded streams
-                if (mediaMetadata.extras?.containsKey("DURATION_MS") == true 
-                    && (mediaMetadata.extras?.getLong("DURATION_MS") ?: 0) > 0) {
+                if (mediaMetadata.extras?.containsKey("durationMs") == true 
+                    && (mediaMetadata.extras?.getLong("durationMs") ?: 0) > 0) {
                     Log.d(javaClass.toString(), "Using metadata duration for transcoded stream")
                 }
             }
@@ -377,7 +377,7 @@ open class BaseMediaService : MediaLibraryService() {
         val artistLink = extras?.getString("assetLinkArtist")
             ?: AssetLinkUtil.buildLink(AssetLinkUtil.TYPE_ARTIST, extras?.getString("artistId"))
         val position = player.currentPosition.takeIf { it != C.TIME_UNSET } ?: 0L
-        val duration = extras?.getLong("DURATION_MS")?.takeIf { it > 0 } 
+        val duration = extras?.getLong("durationMs")?.takeIf { it > 0 } 
             ?: player.duration.takeIf { it != C.TIME_UNSET } 
             ?: 0L
         WidgetUpdateManager.updateFromState(
